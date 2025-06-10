@@ -92,3 +92,35 @@ async function getActress(id: number): Promise<Actress | null> {
     return null;
   }
 }
+
+// Crea una funzione getAllActresses che chiama:
+
+// GET /actresses
+// La funzione deve restituire un array di oggetti Actress.
+
+// Può essere anche un array vuoto.
+
+async function getAllActresses(): Promise<Actress[]> {
+  try {
+    const response = await fetch("https://freetestapi.com/api/v1/actresses");
+    if (!response.ok) {
+      {
+        throw new Error(`Failed to fetch actresses: ${response.statusText}`);
+      }
+      const dati: unknown[] = await response.json();
+
+      if (!(dati instanceof Array)) {
+        throw new Error("Invalid data structure: expected an array");
+      }
+      const attriciValide = dati.filter(isActress);
+      return attriciValide;
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error fetching all actresses:", error.message);
+    } else {
+      console.error("Error fetching all actresses:", error);
+    }
+    return [];
+  }
+}
