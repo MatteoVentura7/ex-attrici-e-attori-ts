@@ -40,3 +40,55 @@ type Actress = Person & {
   awards: string;
   nationality: ActressNationality;
 };
+
+// Crea una funzione getActress che, dato un id, effettua una chiamata a:
+
+// GET /actresses/:id
+// La funzione deve restituire l’oggetto Actress, se esiste, oppure null se non trovato.
+
+// Utilizza un type guard chiamato isActress per assicurarti che la struttura del dato ricevuto sia corretta.
+
+function isActress(dati: unknown): dati is Actress {
+  return (
+    typeof dati === "object" &&
+    dati !== null &&
+    "id" in dati &&
+    typeof dati.id === "number" &&
+    "name" in dati &&
+    typeof dati.name === "string" &&
+    "birth_year" in dati &&
+    typeof dati.birth_year === "number" &&
+    "biography" in dati &&
+    typeof dati.biography === "string" &&
+    "image" in dati &&
+    typeof dati.image === "string" &&
+    "most_famous_movies" in dati &&
+    dati.most_famous_movies instanceof Array &&
+    dati.most_famous_movies.length === 3 &&
+    dati.most_famous_movies.every((movie) => typeof movie === "string") &&
+    "awards" in dati &&
+    typeof dati.awards === "string" &&
+    "nationality" in dati &&
+    typeof dati.nationality === "string"
+  );
+}
+
+async function getActress(id: number): Promise<Actress | null> {
+  try {
+    const response = await fetch(
+      `https://freetestapi.com/api/v1/actresses/${id}`
+    );
+    const dati: unknown = await response.json();
+    if (!isActress(dati)) {
+      throw new Error("Invalid actress data structure");
+    }
+    return dati;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error fetching actress:", error.message);
+    } else {
+      console.error("Error fetching actress:", error);
+    }
+    return null;
+  }
+}
